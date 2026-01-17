@@ -297,18 +297,24 @@ struct ShortcutExplorerCard: View {
             }
             
             // Key Combo Badge
-            HStack(spacing: 3) {
-                 ForEach(shortcut.keyCombo.keyStrings, id: \.self) { key in
+            HStack(spacing: 4) { // Spacing 4 like WikiView
+                 ForEach(Array(shortcut.keyCombo.keyStrings.enumerated()), id: \.offset) { index, key in
+                     if index > 0 {
+                         Text("+")
+                             .font(.caption)
+                             .foregroundStyle(textSecondary)
+                     }
+                     
                      Text(key)
-                         .font(.system(size: 11, weight: .bold, design: .rounded))
-                         .foregroundStyle(textSecondary) // Darker text
-                         .padding(.horizontal, 8)
-                         .padding(.vertical, 4)
-                         .background(bgTertiary) // Light grey background
+                         .font(.system(size: 13, weight: .bold, design: .rounded)) // Size 13
+                         .foregroundStyle(accentColor) // Orange
+                         .padding(.horizontal, 10)
+                         .padding(.vertical, 6)
+                         .background(accentColor.opacity(0.1))
                          .clipShape(RoundedRectangle(cornerRadius: 6))
                          .overlay(
                              RoundedRectangle(cornerRadius: 6)
-                                 .stroke(Color.black.opacity(0.05), lineWidth: 1)
+                                 .stroke(accentColor.opacity(0.2), lineWidth: 1)
                          )
                  }
             }
