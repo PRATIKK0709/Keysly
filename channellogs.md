@@ -2,6 +2,7 @@
 
 | Commit Hash | Description |
 | :--- | :--- |
+| `63da8a3` | feat: Implement ShortcutDetailView (Clickable cards, hidden edit actions) and UI polish |
 | `64568b8` | style: Align ShortcutsExplorer styling with WikiView (Orange keys, + separators) |
 | `9fb9170` | feat: Deep expansion of Wiki with 15+ apps (Music, Photos, Maps, iWork, etc.) |
 | `822bbf6` | feat: Expand Wiki with app-specific shortcuts (Mail, Safari, etc.) and fix compilation errors |
