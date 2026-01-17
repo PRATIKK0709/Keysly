@@ -8,6 +8,8 @@ struct KeyslyApp: App {
     
     @State private var appState = AppState()
     @AppStorage("selectedTheme") private var selectedTheme = "system"
+    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
+    @State private var showOnboarding = false
     
     var body: some Scene {
         // Main window
@@ -15,6 +17,17 @@ struct KeyslyApp: App {
             ContentView()
                 .environment(appState)
                 .preferredColorScheme(colorScheme)
+                .sheet(isPresented: $showOnboarding) {
+                    OnboardingView(isPresented: $showOnboarding)
+                        .environment(appState)
+                        .preferredColorScheme(colorScheme)
+                }
+                .onAppear {
+                    if !hasCompletedOnboarding {
+                        showOnboarding = true
+                        hasCompletedOnboarding = true
+                    }
+                }
         }
         .windowResizability(.contentSize)
         

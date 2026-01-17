@@ -8,6 +8,7 @@ struct SettingsView: View {
     // Persistent Settings
     @AppStorage("compactView") private var gridViewEnabled = false
     @AppStorage("selectedTheme") private var selectedTheme = "system"
+    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = true
     
     // Theme Colors (Adaptive)
     private var textPrimary: Color {
@@ -164,6 +165,37 @@ struct SettingsView: View {
                         }
                     }
                 }
+                
+                // Debug Section (only in DEBUG builds)
+                #if DEBUG
+                sectionContainer(title: "Developer") {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Label("Reset Onboarding", systemImage: "arrow.counterclockwise")
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundStyle(textPrimary)
+                            
+                            Text("Show onboarding on next launch")
+                                .font(.system(size: 11))
+                                .foregroundStyle(textSecondary)
+                                .padding(.leading, 24)
+                        }
+                        
+                        Spacer()
+                        
+                        Button("Reset") {
+                            hasCompletedOnboarding = false
+                        }
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(Color.red.opacity(0.8))
+                        .clipShape(Capsule())
+                        .buttonStyle(.plain)
+                    }
+                }
+                #endif
             }
             .padding(40)
         }
