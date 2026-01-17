@@ -2,6 +2,7 @@
 
 | Commit Hash | Description |
 | :--- | :--- |
+| `dde2435` | feat: Add comprehensive onboarding (5 pages), fix navigation layout, add debug reset option |
 | `3ea57fc` | chore: Update project settings |
 | `ad71578` | polish: Settings About section redesign, fix SF Symbol error |
 | `559d055` | style: Theme polish - Dark mode support, custom theme picker, minimalist settings redesign |
