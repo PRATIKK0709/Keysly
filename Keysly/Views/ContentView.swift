@@ -66,7 +66,7 @@ struct ContentView: View {
                 
                 // Main Content
                 VStack(spacing: 0) {
-                    if !appState.permissionManager.isFullyReady {
+                    if selectedItem == .shortcuts && !appState.permissionManager.isFullyReady {
                         permissionsNeeded
                     } else if isRecording {
                         recordingOverlay
@@ -278,36 +278,16 @@ struct ContentView: View {
     // MARK: - Permissions
     
     private var permissionsNeeded: some View {
-        VStack(spacing: 24) {
-            Spacer()
-            Image(systemName: "lock.shield.fill")
-                .font(.system(size: 48))
-                .foregroundStyle(textSecondary)
-            
-            VStack(spacing: 8) {
-                Text("Permissions Required")
-                    .font(.title3)
-                    .fontWeight(.bold)
-                    .foregroundStyle(textPrimary)
-                Text("Keysly needs Accessibility access to detect shortcuts.")
-                    .font(.subheadline)
-                    .foregroundStyle(textSecondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 40)
+        PermissionsNeededView(
+            bgSecondary: bgSecondary,
+            textSecondary: textSecondary,
+            textPrimary: textPrimary,
+            accentColor: accentColor,
+            colorScheme: colorScheme,
+            onRequestPermission: {
+                appState.permissionManager.requestAccessibility()
             }
-            
-            Button("Open System Settings") {
-                appState.permissionManager.openAccessibilitySettings()
-            }
-            .buttonStyle(.plain)
-            .padding(.horizontal, 16)
-            .padding(.vertical, 10)
-            .background(accentColor)
-            .foregroundStyle(.white)
-            .clipShape(RoundedRectangle(cornerRadius: 8))
-            
-            Spacer()
-        }
+        )
     }
     
     // MARK: - Helpers
@@ -376,5 +356,160 @@ extension Color {
             blue: Double((hex >> 00) & 0xff) / 255,
             opacity: alpha
         )
+    }
+}
+
+// MARK: - Permissions Needed View
+
+struct PermissionsNeededView: View {
+    let bgSecondary: Color
+    let textSecondary: Color
+    let textPrimary: Color
+    let accentColor: Color
+    let colorScheme: ColorScheme
+    let onRequestPermission: () -> Void
+    
+    var body: some View {
+        HStack(spacing: 0) {
+            sidebarView
+            contentView
+        }
+    }
+    
+    private var sidebarView: some View {
+        VStack(spacing: 0) {
+            searchBar
+            sidebarList
+        }
+        .frame(width: 220)
+        .background(bgSecondary.opacity(0.5))
+        .overlay(
+            Rectangle()
+                .fill(colorScheme == .dark ? Color.white.opacity(0.1) : Color.black.opacity(0.05))
+                .frame(width: 1),
+            alignment: .trailing
+        )
+    }
+    
+    private var searchBar: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "magnifyingglass")
+                .font(.system(size: 14))
+                .foregroundStyle(textSecondary)
+            Text("Search")
+                .font(.system(size: 13))
+                .foregroundStyle(textSecondary)
+            Spacer()
+        }
+        .padding(8)
+        .background(colorScheme == .dark ? Color.white.opacity(0.1) : Color.white)
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(colorScheme == .dark ? Color.white.opacity(0.1) : Color.black.opacity(0.1), lineWidth: 1)
+        )
+        .padding(12)
+    }
+    
+    private var sidebarList: some View {
+        ScrollView {
+            LazyVStack(spacing: 4) {
+                allShortcutsItem
+                Divider().padding(.vertical, 8)
+                tagsLabel
+            }
+            .padding(.horizontal, 12)
+            .padding(.bottom, 12)
+        }
+    }
+    
+    private var allShortcutsItem: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "rectangle.grid.2x2.fill")
+                .font(.system(size: 14))
+                .frame(width: 20)
+                .foregroundStyle(.white)
+            Text("All Shortcuts")
+                .font(.system(size: 13, weight: .medium))
+                .foregroundStyle(.white)
+            Spacer()
+            Text("0")
+                .font(.system(size: 11, weight: .bold))
+                .foregroundStyle(.white.opacity(0.8))
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(accentColor)
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+    }
+    
+    private var tagsLabel: some View {
+        Text("TAGS")
+            .font(.system(size: 11, weight: .semibold))
+            .foregroundStyle(textSecondary)
+            .frame(maxWidth: .infinity, alignment: .leading)
+    }
+    
+    private var contentView: some View {
+        VStack(spacing: 0) {
+            headerView
+            permissionsMessage
+        }
+    }
+    
+    private var headerView: some View {
+        HStack {
+            Text("All Shortcuts")
+                .font(.system(size: 32, weight: .bold))
+                .foregroundStyle(textPrimary)
+            Spacer()
+            Image(systemName: "plus")
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundStyle(textSecondary)
+                .padding(8)
+                .background(colorScheme == .dark ? Color.white.opacity(0.05) : Color.white.opacity(0.5))
+                .clipShape(Circle())
+        }
+        .padding(.horizontal, 40)
+        .padding(.top, 40)
+        .padding(.bottom, 24)
+    }
+    
+    private var permissionsMessage: some View {
+        VStack(spacing: 24) {
+            Spacer()
+            Image(systemName: "lock.shield.fill")
+                .font(.system(size: 48))
+                .foregroundStyle(accentColor)
+            messageText
+            permissionButton
+            Spacer()
+        }
+    }
+    
+    private var messageText: some View {
+        VStack(spacing: 8) {
+            Text("Permissions Required")
+                .font(.title3)
+                .fontWeight(.bold)
+                .foregroundStyle(textPrimary)
+            Text("Keysly needs Accessibility access to detect shortcuts.")
+                .font(.subheadline)
+                .foregroundStyle(textSecondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 40)
+        }
+    }
+    
+    private var permissionButton: some View {
+        Button("Open System Settings") {
+            onRequestPermission()
+        }
+        .buttonStyle(.plain)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
+        .background(accentColor)
+        .foregroundStyle(.white)
+        .clipShape(RoundedRectangle(cornerRadius: 8))
     }
 }
