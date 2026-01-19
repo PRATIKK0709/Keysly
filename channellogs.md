@@ -2,6 +2,7 @@
 
 | Commit Hash | Description |
 | :--- | :--- |
+| `a432346` | fix: Permissions UI layout to match Wiki view, add auto-request accessibility, resolve type-checker issues |
 | `3b8dc27` | feat: Add Text Expansion / Type Commands feature with pasteboard-based typing |
 | `dde2435` | feat: Add comprehensive onboarding (5 pages), fix navigation layout, add debug reset option |
 | `3ea57fc` | chore: Update project settings |
