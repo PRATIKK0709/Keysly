@@ -14,6 +14,8 @@ struct AssignmentPromptView: View {
     @State private var scriptType: ScriptType = .shell
     @State private var selectedSystemAction: SystemActionType = .toggleDarkMode
     @State private var selectedShortcutName: String?
+    @State private var typeTextContent: String = ""
+    @State private var typeTextName: String = ""
     @State private var tags: [String] = []
     @State private var newTagText: String = ""
     @State private var didInitialize = false
@@ -33,6 +35,7 @@ struct AssignmentPromptView: View {
         case script = "Script"
         case system = "System"
         case shortcut = "Shortcut"
+        case typeText = "Type Text"
         
         var icon: String {
             switch self {
@@ -41,6 +44,7 @@ struct AssignmentPromptView: View {
             case .script: return "terminal"
             case .system: return "gearshape"
             case .shortcut: return "bolt.fill"
+            case .typeText: return "text.cursor"
             }
         }
     }
@@ -278,6 +282,10 @@ struct AssignmentPromptView: View {
             selectedShortcutName = name
         case .chain:
             selectedActionType = .app
+        case .typeText(let text, let name):
+            selectedActionType = .typeText
+            typeTextContent = text
+            typeTextName = name
         }
         
         // Initialize Tags
@@ -299,6 +307,8 @@ struct AssignmentPromptView: View {
             systemActionPicker
         case .shortcut:
             shortcutPicker
+        case .typeText:
+            typeTextInput
         }
     }
     
@@ -379,6 +389,65 @@ struct AssignmentPromptView: View {
         }
     }
     
+    private var typeTextInput: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            // Snippet Name
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Snippet Name")
+                    .font(.caption)
+                    .foregroundStyle(textSecondary)
+                
+                TextField("e.g. Email Signature, Address, etc.", text: $typeTextName)
+                    .textFieldStyle(.plain)
+                    .font(.system(size: 14))
+                    .padding(12)
+                    .background(Color.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(bgTertiary, lineWidth: 1)
+                    )
+            }
+            
+            // Text Content
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Text("Text to Type")
+                        .font(.caption)
+                        .foregroundStyle(textSecondary)
+                    
+                    Spacer()
+                    
+                    Text("\(typeTextContent.count) characters")
+                        .font(.caption2)
+                        .foregroundStyle(textTertiary)
+                }
+                
+                TextEditor(text: $typeTextContent)
+                    .font(.system(size: 13))
+                    .scrollContentBackground(.hidden)
+                    .padding(12)
+                    .background(Color.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(bgTertiary, lineWidth: 1)
+                    )
+                    .frame(minHeight: 100)
+                
+                // Hint
+                HStack(spacing: 4) {
+                    Image(systemName: "lightbulb.fill")
+                        .font(.system(size: 10))
+                        .foregroundStyle(accentColor.opacity(0.7))
+                    
+                    Text("Use \\n for new lines. Special characters and emoji are supported.")
+                        .font(.caption2)
+                        .foregroundStyle(textTertiary)
+                }
+            }
+        }
+    }
     private var systemActionPicker: some View {
         LazyVGrid(columns: [GridItem(.adaptive(minimum: 140), spacing: 12)], spacing: 12) {
             ForEach(SystemActionType.allCases, id: \.self) { type in
@@ -418,6 +487,7 @@ struct AssignmentPromptView: View {
         case .script: return !scriptContent.isEmpty
         case .system: return true
         case .shortcut: return selectedShortcutName != nil
+        case .typeText: return !typeTextContent.isEmpty
         }
     }
     
@@ -436,6 +506,8 @@ struct AssignmentPromptView: View {
         case .shortcut:
             guard let shortcut = selectedShortcutName else { return nil }
             return .runShortcut(name: shortcut)
+        case .typeText:
+            return .typeText(text: typeTextContent, name: typeTextName)
         }
     }
     
